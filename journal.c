@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 #include <string.h>
 #include "journal.h"
@@ -42,7 +43,8 @@ int new_entry(int day, int wday, int month, int year) {
   }
   sprintf(y, "%d", year);
 
-  char* filename;
+  // YYYYMMDD.html\0
+  char* filename = malloc(sizeof(char) * 14);
   strcpy(filename, y);
   strcat(filename, m);
   strcat(filename, d);
