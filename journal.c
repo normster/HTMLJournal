@@ -31,17 +31,9 @@ int main(int argc, char* argv[])  {
 int new_entry(int day, int wday, int month, int year) {
   char d[10], m[10], y[10];
 
-  if (day < 10) {
-    sprintf(d, "0%d", day);
-  } else {
-    sprintf(d, "%d", day);
-  }
-  if (month < 10) {
-    sprintf(m, "0%d", month);
-  } else {
-    sprintf(m, "%d", month);
-  }
-  sprintf(y, "%d", year);
+  sprintf(d, "%02d", day);
+  sprintf(m, "%02d", month);
+  sprintf(y, "%04d", year);
 
   // YYYYMMDD.html\0
   char* filename = malloc(sizeof(char) * 14);
