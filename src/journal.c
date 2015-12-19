@@ -15,25 +15,22 @@ int main(int argc, char* argv[])  {
 
   time_t t = time(NULL);
   struct tm *tm = localtime(&t);
-  int day = tm->tm_mday;
-  int wday = tm->tm_wday;
-  int month = tm->tm_mon + 1;
-  int year = tm->tm_year + 1900;
+
   char* new = "new";
   if (!strcmp(arg1, new)) {
-    return new_entry(day, wday, month, year);
+    return new_entry(tm);
   }
 
   printf("\'%s\' is not a command.\n", arg1);
   return -1;
 }
 
-int new_entry(int day, int wday, int month, int year) {
+int new_entry(struct tm *tm) {
   char d[10], m[10], y[10];
 
-  sprintf(d, "%02d", day);
-  sprintf(m, "%02d", month);
-  sprintf(y, "%04d", year);
+  sprintf(d, "%02d", tm->tm_mday);
+  sprintf(m, "%02d", (tm->tm_mon + 1));
+  sprintf(y, "%04d", (tm->tm_year + 1900));
 
   // YYYYMMDD.html\0
   char* filename = malloc(sizeof(char) * 14);
@@ -42,43 +39,83 @@ int new_entry(int day, int wday, int month, int year) {
   strcat(filename, d);
   strcat(filename, ".html");
 
-  printf("%s\n", filename);
-
   FILE* fp = fopen(filename, "r+");
   if (!fp) {
     fp = fopen(filename, "w+");
     printf("Creating new file for today. Adding new entry.\n");
+    char* h1_wd;
+    switch (tm->tm_wday) {
+      case 0:
+        h1_wd = "Sunday";
+        break;
+      case 1:
+        h1_wd = "Monday";
+        break;
+      case 2:
+        h1_wd = "Tuesday";
+        break;
+      case 3:
+        h1_wd = "Wednesday";
+        break;
+      case 4:
+        h1_wd = "Thursday";
+        break;
+      case 5:
+        h1_wd = "Friday";
+        break;
+      case 6:
+        h1_wd = "Saturday";
+        break;
+      default:
+        return -1;
+    }
+
+    char* h1_m;
+    switch (tm->tm_mon) {
+      case 0:
+        h1_m = "January";
+        break;
+      case 1:
+        h1_m = "February";
+        break;
+      case 2:
+        h1_m = "March";
+        break;
+      case 3:
+        h1_m = "April";
+        break;
+      case 4:
+        h1_m = "May";
+        break;
+      case 5:
+        h1_m = "June";
+        break;
+      case 6:
+        h1_m = "July";
+        break;
+      case 7:
+        h1_m = "August";
+        break;
+      case 8:
+        h1_m = "September";
+        break;
+      case 9:
+        h1_m = "October";
+        break;
+      case 10:
+        h1_m = "November";
+        break;
+      case 11:
+        h1_m = "December";
+        break;
+      default:
+        return -1;
+    }
+    char* h1;
+    sprintf(h1, "%s, %s %2d, %4d", h1_wd, h1_m, tm->tm_mday, (tm->tm_year+1900));
+    fprintf(fp, "<html>\n  <head>\n  </head>\n  <body>\n    <h1>%s</h1>\n  </body>\n</html>", h1);
   } else {
     printf("Previous file for today found. Adding new entry.\n");
   }
-
-  char* h1;
-  switch (wday) {
-    case 0:
-      h1 = "Sunday, ";
-      break;
-    case 1:
-      h1 = "Monday, ";
-      break;
-    case 2:
-      h1 = "Tuesday, ";
-      break;
-    case 3:
-      h1 = "Wednesday, ";
-      break;
-    case 4:
-      h1 = "Thursday, ";
-      break;
-    case 5:
-      h1 = "Friday, ";
-      break;
-    case 6:
-      h1 = "Saturday, ";
-      break;
-    default:
-      return -1;
-  }
-
-  fprintf(fp, "<html>\n  <head>\n  </head>\n  <body>\n    <h1>%s</h1>\n  </body>\n</html>", h1);
   return 0;
 }

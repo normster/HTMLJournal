@@ -3,8 +3,8 @@ DEBUGFLAGS = -g -O0
 
 CCFLAGS = $(CC)
 
-journal: journal.c
-		$(CCFLAGS) -o journal journal.c
+journal: src/journal.c
+		$(CCFLAGS) -o journal src/journal.c
 
 debug: CCFLAGS += $(DEBUGFLAGS)
 debug: journal
