@@ -53,31 +53,40 @@ int new_entry(int day, int wday, int month, int year) {
   printf("%s\n", filename);
 
   FILE* fp = fopen(filename, "r+");
-  printf("Previous file for today found. Adding new entry.\n");
   if (!fp) {
     fp = fopen(filename, "w+");
     printf("Creating new file for today. Adding new entry.\n");
-    char* h1;
-    switch (wday) {
-      case 0:
-        h1 = "Sunday, ";
-      case 1:
-        h1 = "Monday, ";
-      case 2:
-        h1 = "Tuesday, ";
-      case 3:
-        h1 = "Wednesday, ";
-      case 4:
-        h1 = "Thursday, ";
-      case 5:
-        h1 = "Friday, ";
-      case 6:
-        h1 = "Saturday, ";
-      default:
-        return -1;
-    }
-
-    fprintf(fp, "<html>\n  <head>\n  </head>\n  <body>\n    <h1>%s</h1>\n  </body>\n</html>", h1);
+  } else {
+    printf("Previous file for today found. Adding new entry.\n");
   }
+
+  char* h1;
+  switch (wday) {
+    case 0:
+      h1 = "Sunday, ";
+      break;
+    case 1:
+      h1 = "Monday, ";
+      break;
+    case 2:
+      h1 = "Tuesday, ";
+      break;
+    case 3:
+      h1 = "Wednesday, ";
+      break;
+    case 4:
+      h1 = "Thursday, ";
+      break;
+    case 5:
+      h1 = "Friday, ";
+      break;
+    case 6:
+      h1 = "Saturday, ";
+      break;
+    default:
+      return -1;
+  }
+
+  fprintf(fp, "<html>\n  <head>\n  </head>\n  <body>\n    <h1>%s</h1>\n  </body>\n</html>", h1);
   return 0;
 }
