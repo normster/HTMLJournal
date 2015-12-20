@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <unistd.h>
 #include "journal.h"
 
 int main(int argc, char* argv[])  {
@@ -17,11 +18,17 @@ int main(int argc, char* argv[])  {
   struct tm *tm = localtime(&t);
 
   char* new = "new";
+  char* addi = "addi";
+  char* addt = "addt";
   if (!strcmp(arg1, new)) {
     return new_entry(tm);
+  } else if (!strcmp(arg1, addi)) {
+    return add_image(arg2);
+  } else if (!strcmp(arg1, addt)) {
+    return add_text(arg2);
   }
 
-  printf("\'%s\' is not a command.\n", arg1);
+  printf("\'%s\' is not a valid command.\n", arg1);
   return -1;
 }
 
@@ -39,9 +46,14 @@ int new_entry(struct tm *tm) {
   strcat(filename, d);
   strcat(filename, ".html");
 
-  FILE* fp = fopen(filename, "r+");
-  if (!fp) {
-    fp = fopen(filename, "w+");
+  FILE* fp;
+  if(access(filename, F_OK) != -1) {
+    //exists
+    fp = fopen(filename, "a");
+    printf("Previous file for today found. Adding new entry.\n");
+  } else {
+    //doesnt exist
+    fp = fopen(filename, "a");
     printf("Creating new file for today. Adding new entry.\n");
     char* h1_wd;
     switch (tm->tm_wday) {
@@ -112,10 +124,21 @@ int new_entry(struct tm *tm) {
         return -1;
     }
     char* h1;
-    sprintf(h1, "%s, %s %2d, %4d", h1_wd, h1_m, tm->tm_mday, (tm->tm_year+1900));
-    fprintf(fp, "<html>\n  <head>\n  </head>\n  <body>\n    <h1>%s</h1>\n  </body>\n</html>", h1);
-  } else {
-    printf("Previous file for today found. Adding new entry.\n");
+    sprintf(h1, "%s %s %2d, %4d", h1_wd, h1_m, tm->tm_mday, (tm->tm_year+1900));
+    fprintf(fp, "<h1>%s</h1>\n", h1);
   }
+
+  fprintf(fp, "<h2>%d:%2d<h2>", tm->tm_hour, tm->tm_min);
+  fclose(fp);
+  return 0;
+}
+
+int add_image(char* filename) {
+
+  return 0;
+}
+
+int add_text(char* filename) {
+
   return 0;
 }
