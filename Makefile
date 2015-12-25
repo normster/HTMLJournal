@@ -11,3 +11,4 @@ debug: journal
 
 clean:
 		rm journal
+		rm .current

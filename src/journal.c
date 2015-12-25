@@ -23,8 +23,14 @@ int main(int argc, char* argv[])  {
   if (!strcmp(arg1, new)) {
     return new_entry(tm);
   } else if (!strcmp(arg1, addi)) {
+    if (!add_checker(arg2)) {
+      return -1;
+    }
     return add_image(arg2);
   } else if (!strcmp(arg1, addt)) {
+    if (!add_checker(arg2)) {
+      return -1;
+    }
     return add_text(arg2);
   }
 
@@ -130,15 +136,44 @@ int new_entry(struct tm *tm) {
 
   fprintf(fp, "<h2>%d:%2d<h2>", tm->tm_hour, tm->tm_min);
   fclose(fp);
+
+  FILE* curr_file = fopen(".current", "w");
+  fprintf(curr_file, "%s", filename);
+  fclose(curr_file);
   return 0;
 }
 
 int add_image(char* filename) {
-
+  FILE* curr_file = fopen(".current", "r");
+  char current[20];
+  fread(current, 1, 14, curr_file);
+  FILE* fp = fopen(current, "a");
+  fprintf(fp, "<img src=\"%s\">", filename);
+  fclose(fp);
+  fclose(curr_file);
   return 0;
 }
 
 int add_text(char* filename) {
+  return 0;
+}
 
+int add_checker(char* filename) {
+  if (access(filename, F_OK) == -1) {
+    printf("Input file does not exist.");
+    return -1;
+  }
+  if (access(".current", F_OK) == -1) {
+    printf("No previous entry to append to.");
+    return -1;
+  }
+  FILE* curr_file = fopen(".current", "r");
+  char current[20];
+  fread(current, 1, 14, curr_file);
+  if (!strlen(current)) {
+    printf("No previous entry to append to.");
+    return -1;
+  }
+  fclose(curr_file);
   return 0;
 }
