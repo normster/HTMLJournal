@@ -32,10 +32,10 @@ int main(int argc, char* argv[])  {
       return -1;
     }
     return add_text(arg2);
+  } else {
+    printf("\'%s\' is not a valid command.\n", arg1);
+    return -1;
   }
-
-  printf("\'%s\' is not a valid command.\n", arg1);
-  return -1;
 }
 
 int new_entry(struct tm *tm) {
@@ -148,6 +148,7 @@ int add_image(char* filename) {
   char current[20];
   fread(current, 1, 14, curr_file);
   FILE* fp = fopen(current, "a");
+  printf("%s", current);
   fprintf(fp, "<img src=\"%s\">", filename);
   fclose(fp);
   fclose(curr_file);
@@ -160,18 +161,18 @@ int add_text(char* filename) {
 
 int add_checker(char* filename) {
   if (access(filename, F_OK) == -1) {
-    printf("Input file does not exist.");
+    printf("Input file does not exist.\n");
     return -1;
   }
   if (access(".current", F_OK) == -1) {
-    printf("No previous entry to append to.");
+    printf("No previous entry to append to.\n");
     return -1;
   }
   FILE* curr_file = fopen(".current", "r");
   char current[20];
   fread(current, 1, 14, curr_file);
   if (!strlen(current)) {
-    printf("No previous entry to append to.");
+    printf("No previous entry to append to.\n");
     return -1;
   }
   fclose(curr_file);
