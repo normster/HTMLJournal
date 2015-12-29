@@ -23,12 +23,12 @@ int main(int argc, char* argv[])  {
   if (!strcmp(arg1, new)) {
     return new_entry(tm);
   } else if (!strcmp(arg1, addi)) {
-    if (!add_checker(arg2)) {
+    if (add_checker(arg2)) {
       return -1;
     }
     return add_image(arg2);
   } else if (!strcmp(arg1, addt)) {
-    if (!add_checker(arg2)) {
+    if (add_checker(arg2)) {
       return -1;
     }
     return add_text(arg2);
@@ -134,7 +134,7 @@ int new_entry(struct tm *tm) {
     fprintf(fp, "<h1>%s</h1>\n", h1);
   }
 
-  fprintf(fp, "<h2>%d:%2d<h2>", tm->tm_hour, tm->tm_min);
+  fprintf(fp, "<h2>%d:%2d<h2>\n", tm->tm_hour, tm->tm_min);
   fclose(fp);
 
   FILE* curr_file = fopen(".current", "w");
@@ -145,11 +145,12 @@ int new_entry(struct tm *tm) {
 
 int add_image(char* filename) {
   FILE* curr_file = fopen(".current", "r");
-  char current[20];
+  char current[15];
   fread(current, 1, 14, curr_file);
+  current[14] = '\0';
   FILE* fp = fopen(current, "a");
-  printf("%s", current);
-  fprintf(fp, "<img src=\"%s\">", filename);
+  printf("Adding new image.\n");
+  fprintf(fp, "<img src=\"%s\">\n", filename);
   fclose(fp);
   fclose(curr_file);
   return 0;
