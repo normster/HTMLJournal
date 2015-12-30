@@ -1,8 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <string.h>
-#include <unistd.h>
 #include "journal.h"
 
 int main(int argc, char* argv[])  {
@@ -18,20 +13,20 @@ int main(int argc, char* argv[])  {
   struct tm *tm = localtime(&t);
 
   char* new = "new";
-  char* addi = "addi";
-  char* addt = "addt";
+  char* image = "image";
+  char* text = "text";
   if (!strcmp(arg1, new)) {
     return new_entry(tm);
-  } else if (!strcmp(arg1, addi)) {
-    if (add_checker(arg2)) {
+  } else if (!strcmp(arg1, image)) {
+    if (add_checker()) {
       return -1;
     }
     return add_image(arg2);
-  } else if (!strcmp(arg1, addt)) {
-    if (add_checker(arg2)) {
+  } else if (!strcmp(arg1, text)) {
+    if (add_checker()) {
       return -1;
     }
-    return add_text(arg2);
+    return add_text();
   } else {
     printf("\'%s\' is not a valid command.\n", arg1);
     return -1;
@@ -144,10 +139,13 @@ int new_entry(struct tm *tm) {
 }
 
 int add_image(char* filename) {
+  if (access(filename, F_OK) == -1) {
+    printf("Input file does not exist.\n");
+    return -1;
+  }
   FILE* curr_file = fopen(".current", "r");
   char current[15];
   fread(current, 1, 14, curr_file);
-  current[14] = '\0';
   FILE* fp = fopen(current, "a");
   printf("Adding new image.\n");
   fprintf(fp, "<img src=\"%s\">\n", filename);
@@ -156,15 +154,28 @@ int add_image(char* filename) {
   return 0;
 }
 
-int add_text(char* filename) {
+int add_text() {
+  char* lineptr = NULL;
+  size_t n = 0;
+  ssize_t a = -1;
+  printf("Please enter text:\n");
+  while ((a = getline(&lineptr, &n, stdin)) <= 1) {
+    printf("Invalid text entry. Please try again:\n");
+  }
+  lineptr[a-1] = 0;
+
+  FILE* curr_file = fopen(".current", "r");
+  char current[15];
+  fread(current, 1, 14, curr_file);
+  FILE* fp = fopen(current, "a");
+  printf("\nAdding text.\n");
+  fprintf(fp, "<p>%s</p>\n", lineptr);
+  fclose(fp);
+  fclose(curr_file);
   return 0;
 }
 
-int add_checker(char* filename) {
-  if (access(filename, F_OK) == -1) {
-    printf("Input file does not exist.\n");
-    return -1;
-  }
+int add_checker() {
   if (access(".current", F_OK) == -1) {
     printf("No previous entry to append to.\n");
     return -1;
