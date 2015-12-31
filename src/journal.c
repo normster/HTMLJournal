@@ -125,11 +125,20 @@ int new_entry(struct tm *tm) {
         return -1;
     }
     char* h1;
-    sprintf(h1, "%s %s %2d, %4d", h1_wd, h1_m, tm->tm_mday, (tm->tm_year+1900));
+    sprintf(h1, "%s %s %d, %4d", h1_wd, h1_m, tm->tm_mday, (tm->tm_year+1900));
     fprintf(fp, "<h1>%s</h1>\n", h1);
   }
 
-  fprintf(fp, "<h2>%d:%2d<h2>\n", tm->tm_hour, tm->tm_min);
+  int pm = 0;
+  if (tm->tm_hour > 12) {
+    pm = 1;
+  }
+
+  if (pm) {
+    fprintf(fp, "<h2>%d:%02d pm<h2>\n", tm->tm_hour - 12, tm->tm_min);
+  } else {
+    fprintf(fp, "<h2>%d:%02d am<h2>\n", tm->tm_hour, tm->tm_min);
+  }
   fclose(fp);
 
   FILE* curr_file = fopen(".current", "w");
