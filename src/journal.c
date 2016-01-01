@@ -15,45 +15,46 @@ int main(int argc, char* argv[])  {
   char* new = "new";
   char* image = "image";
   char* text = "text";
+
   if (!strcmp(arg1, new)) {
-    return new_entry(tm);
+    new_entry(tm);
   } else if (!strcmp(arg1, image)) {
-    if (add_checker()) {
+    if (add_checker())
       return -1;
-    }
-    return add_image(arg2);
+    add_image(arg2);
   } else if (!strcmp(arg1, text)) {
-    if (add_checker()) {
+    if (add_checker())
       return -1;
-    }
-    return add_text();
+    add_text();
   } else {
     printf("\'%s\' is not a valid command.\n", arg1);
     return -1;
   }
+  return 0;
 }
 
-int new_entry(struct tm *tm) {
+void new_entry(struct tm *tm) {
   char d[10], m[10], y[10];
 
   sprintf(d, "%02d", tm->tm_mday);
   sprintf(m, "%02d", (tm->tm_mon + 1));
   sprintf(y, "%04d", (tm->tm_year + 1900));
 
-  // YYYYMMDD.html\0
-  char* filename = malloc(sizeof(char) * 14);
-  strcpy(filename, y);
+  // entries/YYYYMMDD.html
+  char* filename = malloc(sizeof(char) * 22);
+  strcpy(filename, "entries/");
+  strcat(filename, y);
   strcat(filename, m);
   strcat(filename, d);
   strcat(filename, ".html");
 
   FILE* fp;
   if(access(filename, F_OK) != -1) {
-    //exists
+    // File exists
     fp = fopen(filename, "a");
     printf("Previous file for today found. Adding new entry.\n");
   } else {
-    //doesnt exist
+    // File doesn't exist
     fp = fopen(filename, "a");
     printf("Creating new file for today. Adding new entry.\n");
     char* h1_wd;
@@ -80,7 +81,8 @@ int new_entry(struct tm *tm) {
         h1_wd = "Saturday";
         break;
       default:
-        return -1;
+        printf("Date error.\n");
+        return;
     }
 
     char* h1_m;
@@ -122,66 +124,75 @@ int new_entry(struct tm *tm) {
         h1_m = "December";
         break;
       default:
-        return -1;
+        printf("Date error.\n");
+        return;
     }
+
+    // Create day heading
     char* h1;
     sprintf(h1, "%s %s %d, %4d", h1_wd, h1_m, tm->tm_mday, (tm->tm_year+1900));
     fprintf(fp, "<h1>%s</h1>\n", h1);
   }
 
   int pm = 0;
-  if (tm->tm_hour > 12) {
+  if (tm->tm_hour > 12)
     pm = 1;
-  }
 
-  if (pm) {
+  // Create entry heading
+  if (pm)
     fprintf(fp, "<h2>%d:%02d pm<h2>\n", tm->tm_hour - 12, tm->tm_min);
-  } else {
+  else
     fprintf(fp, "<h2>%d:%02d am<h2>\n", tm->tm_hour, tm->tm_min);
-  }
-  fclose(fp);
 
   FILE* curr_file = fopen(".current", "w");
   fprintf(curr_file, "%s", filename);
   fclose(curr_file);
-  return 0;
+  fclose(fp);
+  free(filename);
 }
 
-int add_image(char* filename) {
+void add_image(char* filename) {
   if (access(filename, F_OK) == -1) {
     printf("Input file does not exist.\n");
-    return -1;
+    return;
   }
+
   FILE* curr_file = fopen(".current", "r");
   char current[15];
   fread(current, 1, 14, curr_file);
   FILE* fp = fopen(current, "a");
+
   printf("Adding new image.\n");
-  fprintf(fp, "<img src=\"%s\">\n", filename);
+  char* new_filename = malloc(sizeof(char)*(10+strlen(filename)));
+  strcpy(new_filename, "images/");
+  strcat(new_filename, filename);
+  rename(filename, new_filename);
+  fprintf(fp, "<img src=\"%s\">\n", new_filename);
+
   fclose(fp);
   fclose(curr_file);
-  return 0;
 }
 
-int add_text() {
+void add_text() {
   char* lineptr = NULL;
   size_t n = 0;
   ssize_t a = -1;
   printf("Please enter text:\n");
-  while ((a = getline(&lineptr, &n, stdin)) <= 1) {
+  while ((a = getline(&lineptr, &n, stdin)) <= 1)
     printf("Invalid text entry. Please try again:\n");
-  }
+
   lineptr[a-1] = 0;
 
   FILE* curr_file = fopen(".current", "r");
   char current[15];
   fread(current, 1, 14, curr_file);
   FILE* fp = fopen(current, "a");
+
   printf("\nAdding text.\n");
   fprintf(fp, "<p>%s</p>\n", lineptr);
+
   fclose(fp);
   fclose(curr_file);
-  return 0;
 }
 
 int add_checker() {
@@ -189,13 +200,16 @@ int add_checker() {
     printf("No previous entry to append to.\n");
     return -1;
   }
+
   FILE* curr_file = fopen(".current", "r");
   char current[20];
   fread(current, 1, 14, curr_file);
+
   if (!strlen(current)) {
     printf("No previous entry to append to.\n");
     return -1;
   }
+
   fclose(curr_file);
   return 0;
 }

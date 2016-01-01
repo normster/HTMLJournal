@@ -7,11 +7,11 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-int new_entry(struct tm *tm);
+void new_entry(struct tm *tm);
 
-int add_text();
+void add_text();
 
-int add_image(char* filename);
+void add_image(char* filename);
 
 int add_checker();
 
