@@ -129,7 +129,7 @@ void new_entry(struct tm *tm) {
     }
 
     // Create day heading
-    char* h1;
+    char* h1 = malloc(sizeof(char) * 200);
     sprintf(h1, "%s %s %d, %4d", h1_wd, h1_m, tm->tm_mday, (tm->tm_year+1900));
     fprintf(fp, "<h1>%s</h1>\n", h1);
   }

@@ -12,3 +12,4 @@ debug: journal
 clean:
 		rm journal
 		rm .current
+		rm entries/2*
